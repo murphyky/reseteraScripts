@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.93
+// @version      0.94
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -138,13 +138,13 @@ padding:0 4px;
         hideShowThreads();
 
         for (var i = 0; i < blockedThreadsDropdown.length; i++) {
-            if (val === blockedThreadsDropdown.options[i].value){
+            if (val === blockedThreadsDropdown.options[i].value) {
                 blockedThreadsDropdown.remove(i);
             }
         }
     }
 
-    window.pushToBlocklist = function (str) {
+    window.pushToBlocklist = function(str) {
         localStorage.blockList = localStorage.blockList || "[]";
         var blockList = JSON.parse(localStorage.blockList);
         blockList.push(str);
@@ -163,36 +163,35 @@ padding:0 4px;
         initiateBlockedThreadDropdown();
     }
 
-    function hideShowThreads(){
+    function hideShowThreads() {
 
         var blockList = localStorage.blockList ? JSON.parse(localStorage.blockList) : [];
 
         var d = document.getElementsByClassName("discussionListItem");
 
-        for (var y = 0; y < d.length;y++) {
+        for (var y = 0; y < d.length; y++) {
             var elem = d[y];
 
             for (var i = 0; i < blockList.length; i++) {
 
-                var hideElem=false;
+                var hideElem = false;
 
-                if (elem.innerText.toLowerCase().indexOf(blockList[i].toLowerCase())>-1){
+                if (elem.innerText.toLowerCase().indexOf(blockList[i].toLowerCase()) > -1) {
 
                     hideElem = true;
-                    console.log("Hiding this thread", elem.innerText);
-                    elem.style.display = "none";
-                } 
-
-                if (hideElem) {
-                    console.log("Hiding this thread", elem.innerText);
-                    elem.style.display = "none";                    
-                } else {
-                    if (elem.style.display === "none") {
-                        console.log("Unhiding this thread", elem.innerText);
-                        elem.style.display = "";
-                    }
                 }
             }
+
+            if (hideElem) {
+                console.log("Hiding this thread", elem.innerText);
+                elem.style.display = "none";
+            } else {
+                if (elem.style.display === "none") {
+                    console.log("Unhiding this thread", elem.innerText);
+                    elem.style.display = "";
+                }
+            }
+
         }
     }
 
