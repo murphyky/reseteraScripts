@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.6
+// @version      0.61
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/*
 // @grant none
-// @run-at        document-start
+// @run-at        document-idle
 // @namespace    http://tampermonkey.net/
 // @license CC-BY-NC-SA-4.0; https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 // @license GPL-3.0+; http://www.gnu.org/licenses/gpl-3.0.txt
