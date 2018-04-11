@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.8
+// @version      0.81
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
-// @match        https://www.resetera.com/*
+// @match        https://www.resetera.com/forums/*
 // @grant GM_addStyle
 // @run-at        document-idle
 // @namespace    http://tampermonkey.net/
