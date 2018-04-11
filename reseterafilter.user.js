@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.82
+// @version      0.83
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -27,7 +27,7 @@ top: 10px;
 float:left;
 width: 80%;
 }
-.hideButton{
+.customButtons{
 padding: 8px;
 color: white !important;
 text-align:center;
@@ -50,9 +50,12 @@ padding:0 4px;
     var topNav = document.getElementsByClassName("PageNav");
     topNav = topNav[0];
 
-    var unblockButton = document.createElement("button");
+    var unblockButton = document.createElement("a");
     unblockButton.onclick = unblockThread;
+    unblockButton.href = "/#/";
+    unblockButton.href = "customButtons";
     unblockButton.innerText = "Unblock Item";
+    unblockButton.id = "unblockButton";
 
     var unblockContainer = document.createElement("div");
     unblockContainer.className = "unblockContainer";
@@ -63,7 +66,10 @@ padding:0 4px;
     keyWordFilter.id = "keyWordFilter";
     keyWordFilter.label = "Enter keyword to filter out threads";
     keyWordFilter.type = "text";
-    var filterKeywordButton = document.createElement("button");
+    var filterKeywordButton = document.createElement("a");
+
+    filterKeywordButton.href = "/#/"
+    filterKeywordButton.className = "customButtons";
     filterKeywordButton.onclick = filterByKeyword;
     filterKeywordButton.innerText = "Add keyword to filter";
     filterKeywordButton.id = "filterKeywordButton";
@@ -181,7 +187,7 @@ padding:0 4px;
         hideDiv.appendChild(g);
         g.href = "/#/";
         g.onclick = hide;
-        g.className = "hideButton";
+        g.className = "customButtons";
         g.innerText = "Hide";
         var threadSubSection = threads[i].getElementsByClassName("main")[0];
         threadSubSection.appendChild(hideDiv);
