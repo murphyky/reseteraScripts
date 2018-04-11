@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.94
+// @version      0.95
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -171,19 +171,20 @@ padding:0 4px;
 
         for (var y = 0; y < d.length; y++) {
             var elem = d[y];
-
+            var threadTitle = null;
             for (var i = 0; i < blockList.length; i++) {
 
-                var hideElem = false;
+                var text = elem.getElementsByTagName("h3")[0];
+                text = text.innerText;
+                text = text.trim();
 
-                if (elem.innerText.toLowerCase().indexOf(blockList[i].toLowerCase()) > -1) {
-
-                    hideElem = true;
+                if (text.toLowerCase().indexOf(blockList[i].toLowerCase()) > -1) {
+                    threadTitle = text;
                 }
             }
 
-            if (hideElem) {
-                console.log("Hiding this thread", elem.innerText);
+            if (threadTitle) {
+                console.log("Hiding this thread", threadTitle);
                 elem.style.display = "none";
             } else {
                 if (elem.style.display === "none") {
