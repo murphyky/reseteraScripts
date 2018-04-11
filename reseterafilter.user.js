@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.3
+// @version      0.4
 // @description  Filters threads based on keywords
-// @author       Kyle
+// @author       Kyle Murphy
 // @match        https://www.resetera.com/*
 // @grant none
 // @run-at        document-start
@@ -34,7 +34,7 @@
 
             for (var i = 0; i < blockList.length; i++) {
                 if (elem.innerText.toLowerCase().indexOf(blockList[i].toLowerCase())>-1){
-                    console.log("hiding this thread", elem.innerText);
+                    console.log("Hiding this thread", elem.innerText);
                     elem.style.display = "none";
                 }
             }
