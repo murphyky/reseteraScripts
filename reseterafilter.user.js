@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.5
+// @version      0.6
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/*
@@ -20,8 +20,10 @@
     'use strict';
 
     window.pushToBlocklist = function (str) {
-        localStorage.blockList = localStorage.blockList || "";
-        localStorage.blockList += ("|" + str.toLowerCase());
+        localStorage.blockList = localStorage.blockList || "[]";
+        var blockList = JSON.parse(localStorage.blockList);
+        blockList.push(str);
+        localStorage.blockList = JSON.stringify(blockList);
     };
 
     window.onload = function(){
@@ -33,6 +35,7 @@
             var elem = d[y];
 
             for (var i = 0; i < blockList.length; i++) {
+
                 if (elem.innerText.toLowerCase().indexOf(blockList[i].toLowerCase())>-1){
                     console.log("Hiding this thread", elem.innerText);
                     elem.style.display = "none";
