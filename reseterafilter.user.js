@@ -174,7 +174,7 @@ padding:0 4px;
 
             for (var i = 0; i < blockList.length; i++) {
 
-                var hideElemv=false;
+                var hideElem=false;
 
                 if (elem.innerText.toLowerCase().indexOf(blockList[i].toLowerCase())>-1){
 
