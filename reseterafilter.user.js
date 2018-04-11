@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.71
+// @version      0.72
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/*
@@ -30,7 +30,7 @@
 
     function hideThreads(){
 
-        var blockList = localStorage ? JSON.parse(localStorage.blockList) : [];
+        var blockList = localStorage.blockList ? JSON.parse(localStorage.blockList) : [];
 
         var d = document.getElementsByClassName("discussionListItem");
 
