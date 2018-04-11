@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.72
+// @version      0.74
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/*
-// @grant none
+// @grant GM_addStyle
 // @run-at        document-idle
 // @namespace    http://tampermonkey.net/
 // @license CC-BY-NC-SA-4.0; https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
@@ -15,6 +15,25 @@
 
 // ==/UserScript==
 
+
+GM_addStyle(`
+.hideButtonDiv {
+background: #7e52b8;
+position:relative;
+float:right;
+top: 10px;
+}
+.titleText {
+float:left;
+width: 80%;
+}
+.hideButton{
+color: white !important;
+border-radius:10px;
+text-align:center;
+padding:0 4px;
+}
+`);
 
 (function() {
     'use strict';
@@ -45,29 +64,30 @@
                 }
             }
         }
-
-    };
+    }
 
 
     var threads = document.getElementsByClassName("discussionListItem");
 
     function hide(e) {
         e.preventDefault();
-        console.log(e);
 
         var threadTitle = e.toElement.parentNode.getElementsByTagName("h3")[0];
         var blockThreadText = threadTitle.innerText;
-        pushToBlocklist(blockThreadText)
+        pushToBlocklist(blockThreadText);
         hideThreads();
     }
 
     for (var i = 0; i < threads.length; i++) {
-        var g = document.createElement("button");
-        g.innerText = "Hide Thread";
+        var g = document.createElement("a");
+        var hideDiv = document.createElement("div");
+        hideDiv.className = "hideButtonDiv";
+        hideDiv.appendChild(g);
+        g.href = "/#/";
         g.onclick = hide;
-        threads[i].appendChild(g)
+        g.className = "hideButton fa fa-times";
+        var threadSubSection = threads[i].getElementsByClassName("main")[0];
+        threadSubSection.appendChild(hideDiv);
     }
-
-
 
 })();
