@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.81
+// @version      0.82
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -75,7 +75,7 @@ padding:0 4px;
     keyworldFilterContainer.appendChild(filterKeywordButton);
 
     var extraFilteringOptionsContainer = document.createElement("div");
-
+    extraFilteringOptionsContainer.id = "extraFilteringOptionsContainer";
     extraFilteringOptionsContainer.appendChild(keyworldFilterContainer);
     extraFilteringOptionsContainer.appendChild(unblockContainer);
 
