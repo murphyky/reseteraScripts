@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.74
+// @version      0.75
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/*
@@ -14,12 +14,11 @@
 // @updateURL https://github.com/murphyky/reseteraScripts/raw/master/reseterafilter.user.js
 
 // ==/UserScript==
-
-
 GM_addStyle(`
 .hideButtonDiv {
 background: #7e52b8;
 position:relative;
+border-radius:3px;
 float:right;
 top: 10px;
 }
@@ -28,8 +27,8 @@ float:left;
 width: 80%;
 }
 .hideButton{
+padding: 8px;
 color: white !important;
-border-radius:10px;
 text-align:center;
 padding:0 4px;
 }
@@ -85,7 +84,8 @@ padding:0 4px;
         hideDiv.appendChild(g);
         g.href = "/#/";
         g.onclick = hide;
-        g.className = "hideButton fa fa-times";
+        g.className = "hideButton";
+        g.innerText = "Hide";
         var threadSubSection = threads[i].getElementsByClassName("main")[0];
         threadSubSection.appendChild(hideDiv);
     }
