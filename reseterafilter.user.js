@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.83
+// @version      0.85
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -16,7 +16,7 @@
 // ==/UserScript==
 
 GM_addStyle(`
-.hideButtonDiv {
+.customButtonDiv {
 background: #7e52b8;
 position:relative;
 border-radius:3px;
@@ -43,42 +43,49 @@ padding:0 4px;
 
     var blockedThreadsDropdown = document.createElement("select");
     var defaultOption = document.createElement("option")
-    defaultOption.value = "--- Remove a filter ---";
+    defaultOption.innerText = "--- Remove a filter ---";
     blockedThreadsDropdown.appendChild(defaultOption);
     blockedThreadsDropdown.id = "blockedThreadsDropdown";
 
     var topNav = document.getElementsByClassName("PageNav");
     topNav = topNav[0];
 
+    var unblockButtonDiv = document.createElement("div");
+    unblockButtonDiv.className = "customButtonDiv";
     var unblockButton = document.createElement("a");
     unblockButton.onclick = unblockThread;
     unblockButton.href = "/#/";
-    unblockButton.href = "customButtons";
+    unblockButton.className = "customButtons";
     unblockButton.innerText = "Unblock Item";
     unblockButton.id = "unblockButton";
+    unblockButtonDiv.appendChild(unblockButton);
 
     var unblockContainer = document.createElement("div");
     unblockContainer.className = "unblockContainer";
     unblockContainer.appendChild(blockedThreadsDropdown);
-    unblockContainer.appendChild(unblockButton);
+    unblockContainer.appendChild(unblockButtonDiv);
 
     var keyWordFilter = document.createElement("input");
     keyWordFilter.id = "keyWordFilter";
-    keyWordFilter.label = "Enter keyword to filter out threads";
+    keyWordFilter.placeholder = "Enter keyword to filter out threads";
     keyWordFilter.type = "text";
-    var filterKeywordButton = document.createElement("a");
 
+
+    var filterKeywordDiv = document.createElement("div");
+    filterKeywordDiv.className = "customButtonDiv";
+    var filterKeywordButton = document.createElement("a");
     filterKeywordButton.href = "/#/"
     filterKeywordButton.className = "customButtons";
     filterKeywordButton.onclick = filterByKeyword;
     filterKeywordButton.innerText = "Add keyword to filter";
     filterKeywordButton.id = "filterKeywordButton";
+    filterKeywordDiv.appendChild(filterKeywordButton);
 
     var keyworldFilterContainer = document.createElement("div");
     keyworldFilterContainer.id = "keyworldFilterContainer";
 
     keyworldFilterContainer.appendChild(keyWordFilter);
-    keyworldFilterContainer.appendChild(filterKeywordButton);
+    keyworldFilterContainer.appendChild(filterKeywordDiv);
 
     var extraFilteringOptionsContainer = document.createElement("div");
     extraFilteringOptionsContainer.id = "extraFilteringOptionsContainer";
@@ -183,7 +190,7 @@ padding:0 4px;
     for (var i = 0; i < threads.length; i++) {
         var g = document.createElement("a");
         var hideDiv = document.createElement("div");
-        hideDiv.className = "hideButtonDiv";
+        hideDiv.className = "customButtonDiv";
         hideDiv.appendChild(g);
         g.href = "/#/";
         g.onclick = hide;
