@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.75
+// @version      0.76
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/*
@@ -14,6 +14,7 @@
 // @updateURL https://github.com/murphyky/reseteraScripts/raw/master/reseterafilter.user.js
 
 // ==/UserScript==
+
 GM_addStyle(`
 .hideButtonDiv {
 background: #7e52b8;
@@ -71,7 +72,7 @@ padding:0 4px;
     function hide(e) {
         e.preventDefault();
 
-        var threadTitle = e.toElement.parentNode.getElementsByTagName("h3")[0];
+        var threadTitle = e.toElement.parentElement.previousElementSibling.getElementsByTagName("h3")[0];
         var blockThreadText = threadTitle.innerText;
         pushToBlocklist(blockThreadText);
         hideThreads();
