@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.1
+// @version      0.2
 // @description  Filters threads based on keywords
 // @author       Kyle
 // @match        https://www.resetera.com/*
@@ -34,7 +34,7 @@
 
             for (var i = 0; i < blockList.length; i++) {
                 if (elem.innerText.toLowerCase().indexOf(blockList[i].toLowerCase())>-1){
-                    console.log("hiding ", elem.innerText);
+                    console.log("hiding this thread", elem.innerText);
                     elem.style.display = "none";
                 }
             }
