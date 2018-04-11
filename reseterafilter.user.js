@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.7
+// @version      0.71
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/*
@@ -26,9 +26,12 @@
         localStorage.blockList = JSON.stringify(blockList);
     };
 
-    window.onload = function(){
+    window.onload = hideThreads;
 
-        var blockList = localStorage.blockList ? localStorage.blockList.split("|") : [];
+    function hideThreads(){
+
+        var blockList = localStorage ? JSON.parse(localStorage.blockList) : [];
+
         var d = document.getElementsByClassName("discussionListItem");
 
         for (var y = 0; y < d.length;y++) {
@@ -55,6 +58,7 @@
         var threadTitle = e.toElement.parentNode.getElementsByTagName("h3")[0];
         var blockThreadText = threadTitle.innerText;
         pushToBlocklist(blockThreadText)
+        hideThreads();
     }
 
     for (var i = 0; i < threads.length; i++) {
