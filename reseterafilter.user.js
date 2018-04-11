@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.61
+// @version      0.7
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/*
