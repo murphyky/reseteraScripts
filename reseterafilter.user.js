@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.0.3
+// @version      1.0.5
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -122,9 +122,13 @@ padding:0 4px;
             return username;
         }
 
-        function updateServer() {
+        function syncWithServer(cb) {
 
-            var data = JSON.stringify({user:username,blockList:localStorage.blockList || "[]"});
+            var data = JSON.stringify({
+                user:username,
+                blockList:localStorage.blockList || "[]",
+                scheduleToDelete: localStorage.scheduleToDelete || "[]"
+            });
 
             $.ajax({
                 type: "POST",
@@ -141,9 +145,12 @@ padding:0 4px;
                         var blockList = res.data.filters;
                         localStorage.blockList = JSON.stringify(blockList);                        
                     }
+
+                    cb()
                 },
                 error: function(err){
                     console.error(err);
+                    cb();
                 }
             });
         }
@@ -153,7 +160,10 @@ padding:0 4px;
             //prevent empty strings from removing every thread
             if (!!keyWordFilter.value.trim()) {
                 pushToBlocklist(keyWordFilter.value);
-                hideShowThreads();
+
+                syncWithServer(function(){
+                    hideShowThreads();
+                });
             }
         }
 
@@ -178,13 +188,21 @@ padding:0 4px;
                 return blockedItem !== val;
             });
             localStorage.blockList = JSON.stringify(blockList);
-            hideShowThreads();
 
-            for (var i = 0; i < blockedThreadsDropdown.length; i++) {
-                if (val === blockedThreadsDropdown.options[i].value) {
-                    blockedThreadsDropdown.remove(i);
+            localStorage.scheduleToDelete = localStorage.scheduleToDelete || "[]";
+            var scheduleToDelete = JSON.parse(localStorage.scheduleToDelete);
+            scheduleToDelete.push(val);
+            localStorage.scheduleToDelete = JSON.stringify(scheduleToDelete);
+
+            syncWithServer(function(){
+                hideShowThreads();
+
+                for (var i = 0; i < blockedThreadsDropdown.length; i++) {
+                    if (val === blockedThreadsDropdown.options[i].value) {
+                        blockedThreadsDropdown.remove(i);
+                    }
                 }
-            }
+            });
         }
 
         window.pushToBlocklist = function(str) {
@@ -200,15 +218,16 @@ padding:0 4px;
         };
 
         function init() {
-            hideShowThreads();
-            initiateBlockedThreadDropdown();
+
+            syncWithServer(function(){
+                hideShowThreads();
+                initiateBlockedThreadDropdown();
+            });
         }
 
         init();
 
         function hideShowThreads() {
-
-            updateServer();
 
             var blockList = localStorage.blockList ? JSON.parse(localStorage.blockList) : [];
 
@@ -254,7 +273,9 @@ padding:0 4px;
             }
             var blockThreadText = threadTitle.innerText;
             pushToBlocklist(blockThreadText);
-            hideShowThreads();
+            syncWithServer(function(){
+                hideShowThreads();
+            });
         }
 
         for (var i = 0; i < threads.length; i++) {
