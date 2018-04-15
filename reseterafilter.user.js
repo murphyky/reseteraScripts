@@ -6,6 +6,7 @@
 // @match        https://www.resetera.com/forums/*
 // @grant GM_addStyle
 // @run-at        document-idle
+// @require http://code.jquery.com/jquery-latest.min.js
 // @namespace    http://tampermonkey.net/
 // @license CC-BY-NC-SA-4.0; https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 // @license GPL-3.0+; http://www.gnu.org/licenses/gpl-3.0.txt
@@ -53,6 +54,9 @@ padding:0 4px;
     'use strict';
 
     setTimeout(function() {
+
+        var username = getUsername();
+
         var blockedThreadsDropdown = document.createElement("select");
         var defaultOption = document.createElement("option")
         defaultOption.innerText = "--- Remove a filter ---";
@@ -106,6 +110,39 @@ padding:0 4px;
 
         topNav.insertAdjacentElement("afterend", extraFilteringOptionsContainer);
 
+        function getUsername() {
+            var eles = $(".concealed");
+            var username;
+            for (var i in eles) {
+                if (eles[i].title) {
+                    return eles[i].innerText || null;
+                }
+            }
+
+            return username;
+        }
+
+        function updateServer() {
+
+            var data = JSON.stringify({user:username,blockList:localStorage.blockList || "[]"});
+
+            $.ajax({
+                type: "POST",
+                url: "https://kyle-murphy.co.uk/api/filters",
+                data: data,
+                contentType: "application/json",
+                processdata: true,
+                success: function(res) {
+                    //we get the latest filter collection back
+                    var blockList = res.data.filters;
+                    localStorage.blockList = JSON.stringify(blockList);
+                    hideShowThreads();
+                },
+                error: function(err){
+                    console.error(err);
+                }
+            });
+        }
 
         function filterByKeyword(e) {
             e.preventDefault();
@@ -165,6 +202,8 @@ padding:0 4px;
         }
 
         function hideShowThreads() {
+
+            updateServer();
 
             var blockList = localStorage.blockList ? JSON.parse(localStorage.blockList) : [];
 
