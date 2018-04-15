@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.0
+// @version      1.01
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -133,9 +133,14 @@ padding:0 4px;
                 contentType: "application/json",
                 processdata: true,
                 success: function(res) {
-                    //we get the latest filter collection back
-                    var blockList = res.data.filters;
-                    localStorage.blockList = JSON.stringify(blockList);
+
+                    res = res || {};
+                    res.data = res.data || {};
+                    if (res.data.filters) {
+                        //we get the latest filter collection back
+                        var blockList = res.data.filters;
+                        localStorage.blockList = JSON.stringify(blockList);                        
+                    }
                     hideShowThreads();
                 },
                 error: function(err){
