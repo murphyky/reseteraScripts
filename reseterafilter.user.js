@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      0.98
+// @version      1.0
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -166,6 +166,7 @@ padding:0 4px;
 
         function unblockThread(e) {
             e.preventDefault();
+
             var val = blockedThreadsDropdown.value;
             localStorage.blockList = localStorage.blockList || "[]";
             var blockList = JSON.parse(localStorage.blockList);
