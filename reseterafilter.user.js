@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.0.5
+// @version      1.0.6
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -198,7 +198,7 @@ padding:0 4px;
                 hideShowThreads();
 
                 for (var i = 0; i < blockedThreadsDropdown.length; i++) {
-                    if (val === blockedThreadsDropdown.options[i].value) {
+                    if (blockList.indexOf(blockedThreadsDropdown.options[i].value) === -1){
                         blockedThreadsDropdown.remove(i);
                     }
                 }
