@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.0.7
+// @version      1.0.9
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -351,7 +351,7 @@ padding:0 4px;
             var blockThreadText = threadTitle.innerText;
             var createDate = new Date();
 
-            var filter {
+            var filter = {
                 value: blockThreadText,
                 created: createDate
             }
