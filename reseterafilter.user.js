@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.0.6
+// @version      1.0.7
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
 // @grant GM_addStyle
 // @run-at        document-idle
-// @require http://code.jquery.com/jquery-latest.min.js
+// @require https://code.jquery.com/jquery-1.12.4.js
+// @require https://code.jquery.com/ui/1.12.1/jquery-ui.js
 // @namespace    http://tampermonkey.net/
 // @license CC-BY-NC-SA-4.0; https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 // @license GPL-3.0+; http://www.gnu.org/licenses/gpl-3.0.txt
@@ -37,6 +38,7 @@ padding:0 4px;
 #blockedThreadsDropdown{
     width: 175px;
 }
+
 #extraFilteringOptionsContainer #keyWordFilter {
         float: left;
         width: 170px;
@@ -109,6 +111,10 @@ padding:0 4px;
         extraFilteringOptionsContainer.appendChild(unblockContainer);
 
         topNav.insertAdjacentElement("afterend", extraFilteringOptionsContainer);
+        var CP = buildControlPanel();
+        topNav.insertAdjacentElement("afterend", CP);
+
+        $('.controlGroup').controlgroup();
 
         function getUsername() {
             var eles = $(".concealed");
@@ -122,12 +128,13 @@ padding:0 4px;
             return username;
         }
 
-        function syncWithServer(cb) {
+        function syncWithServer(cb, createDate) {
 
             var data = JSON.stringify({
                 user:username,
                 blockList:localStorage.blockList || "[]",
-                scheduleToDelete: localStorage.scheduleToDelete || "[]"
+                unblockList: localStorage.unblockList || "[]",
+                createDate: createDate
             });
 
             $.ajax({
@@ -143,6 +150,8 @@ padding:0 4px;
                     if (res.data.filters) {
                         //we get the latest filter collection back
                         var blockList = res.data.filters;
+                        console.log(blockList)
+
                         localStorage.blockList = JSON.stringify(blockList);                        
                     }
 
@@ -155,15 +164,17 @@ padding:0 4px;
             });
         }
 
+        //do a simple pattern match and block threads by keyword (eg: 'Trump', 'Brexit')
         function filterByKeyword(e) {
             e.preventDefault();
             //prevent empty strings from removing every thread
             if (!!keyWordFilter.value.trim()) {
-                pushToBlocklist(keyWordFilter.value);
+                var createDate = new Date();
+                pushToBlocklist(keyWordFilter.value, createDate);
 
                 syncWithServer(function(){
                     hideShowThreads();
-                });
+                }, createDate);
             }
         }
 
@@ -178,22 +189,68 @@ padding:0 4px;
             }
         }
 
+        function buildElem(elem, className, innerText) {
+
+            var ele = document.createElement(elem);
+            if (className)
+                ele.className = className;
+            if (innerText)
+                ele.innerText = innerText;
+            return ele;
+        }
+
+        function buildControlPanel() {
+
+            var CP = buildElem("div", "widget", null)
+            .appendChild(buildElem("fieldset", null, null))
+            .appendChild(buildElem("legend", null, "Blacklisted threads and keywords"))
+            .insertAdjacentElement("afterend", buildElem("div", "controlGroup", null))
+            
+            var unorderedList = buildElem("ul", "blockList", null);
+
+            getBlockedItems().forEach(function(blockedItem){
+
+                var blockedListItem = buildElem("li", "blockedListItem", blockedItem);
+
+                var href = buildElem("a", "customButtons", "Unblock");
+                href.onclick = unblockThread;
+                href.href = "/#/";
+
+                var unblockButton = buildElem("div", "customButtonDiv", null);
+                unblockButton.appendChild(href);
+
+                blockedListItem.appendChild(unblockButton);
+                unorderedList.appendChild(blockedListItem);
+            });
+
+            CP.appendChild(unorderedList);
+            console.log(CP);
+            return CP;
+        }
+
         function unblockThread(e) {
+            console.log(e);
             e.preventDefault();
+
+            var createDate = new Date();
 
             var val = blockedThreadsDropdown.value;
             localStorage.blockList = localStorage.blockList || "[]";
             var blockList = JSON.parse(localStorage.blockList);
             blockList = blockList.filter(function(blockedItem) {
-                return blockedItem !== val;
+                var blockedItemVal = blockedItem.value;
+                return blockedItem !== blockedItemVal;
             });
             localStorage.blockList = JSON.stringify(blockList);
 
-            localStorage.scheduleToDelete = localStorage.scheduleToDelete || "[]";
-            var scheduleToDelete = JSON.parse(localStorage.scheduleToDelete);
-            scheduleToDelete.push(val);
-            localStorage.scheduleToDelete = JSON.stringify(scheduleToDelete);
+            localStorage.unblockList = localStorage.unblockList || "[]";
+            var unblockList = JSON.parse(localStorage.unblockList);
+            unblockList.push({
+                value: val,
+                created: createDate
+            });
 
+            localStorage.unblockList = JSON.stringify(unblockList);
             syncWithServer(function(){
                 hideShowThreads();
 
@@ -202,13 +259,26 @@ padding:0 4px;
                         blockedThreadsDropdown.remove(i);
                     }
                 }
-            });
+            }, createDate);
         }
 
-        window.pushToBlocklist = function(str) {
+        function getBlockedItems() {
             localStorage.blockList = localStorage.blockList || "[]";
             var blockList = JSON.parse(localStorage.blockList);
-            blockList.push(str);
+            return blockList;            
+        }
+
+        window.pushToBlocklist = function(str, createDate) {
+
+            localStorage.blockList = localStorage.blockList || "[]";
+            var blockList = JSON.parse(localStorage.blockList);
+
+            var filter = {
+                value: str,
+                created: createDate
+            }
+
+            blockList.push(filter);
             localStorage.blockList = JSON.stringify(blockList);
 
             var newOption = document.createElement("option");
@@ -222,7 +292,7 @@ padding:0 4px;
             syncWithServer(function(){
                 hideShowThreads();
                 initiateBlockedThreadDropdown();
-            });
+            }, new Date());
         }
 
         init();
@@ -242,7 +312,9 @@ padding:0 4px;
                     text = text.innerText;
                     text = text.trim();
 
-                    if (text.toLowerCase().indexOf(blockList[i].toLowerCase()) > -1) {
+                    var blockListFilter = blockList[i].value || "";
+
+                    if (text.toLowerCase().indexOf(blockListFilter.toLowerCase()) > -1) {
                         threadTitle = text;
                     }
                 }
@@ -272,10 +344,17 @@ padding:0 4px;
                 threadTitle = e.target.parentElement.previousElementSibling.getElementsByTagName("h3")[0];
             }
             var blockThreadText = threadTitle.innerText;
-            pushToBlocklist(blockThreadText);
+            var createDate = new Date();
+
+            var filter {
+                value: blockThreadText,
+                created: createDate
+            }
+
+            pushToBlocklist(filter);
             syncWithServer(function(){
                 hideShowThreads();
-            });
+            }, createDate);
         }
 
         for (var i = 0; i < threads.length; i++) {
