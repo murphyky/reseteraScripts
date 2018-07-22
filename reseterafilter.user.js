@@ -339,8 +339,13 @@ padding:0 4px;
             e.preventDefault();
             var threadTitle;
             if (e.toElement) {
+                var parentElement = e.toElement.parentElement;
+                parentElement = parentElement.parentElement;
                 threadTitle = e.toElement.parentElement.previousElementSibling.getElementsByTagName("h3")[0];
             } else {
+                var parentElement = e.target.parentElement;
+                parentElement = parentElement.parentElement;
+
                 threadTitle = e.target.parentElement.previousElementSibling.getElementsByTagName("h3")[0];
             }
             var blockThreadText = threadTitle.innerText;
