@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.0.9
+// @version      1.1.0
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -341,12 +341,12 @@ padding:0 4px;
             if (e.toElement) {
                 var parentElement = e.toElement.parentElement;
                 parentElement = parentElement.parentElement;
-                threadTitle = e.toElement.parentElement.previousElementSibling.getElementsByTagName("h3")[0];
+                threadTitle = parentElement.previousElementSibling.getElementsByTagName("h3")[0];
             } else {
                 var parentElement = e.target.parentElement;
                 parentElement = parentElement.parentElement;
 
-                threadTitle = e.target.parentElement.previousElementSibling.getElementsByTagName("h3")[0];
+                threadTitle = parentElement.previousElementSibling.getElementsByTagName("h3")[0];
             }
             var blockThreadText = threadTitle.innerText;
             var createDate = new Date();
