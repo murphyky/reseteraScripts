@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.1.2
+// @version      1.1.3
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -150,9 +150,7 @@ padding:0 4px;
                     if (res.data.filters) {
                         //we get the latest filter collection back
                         var blockList = res.data.filters;
-                        console.log(blockList)
-
-                        localStorage.blockList = JSON.stringify(blockList);                        
+                        setBlockList(blockList);
                     }
 
                     cb()
@@ -182,9 +180,10 @@ padding:0 4px;
             localStorage.blockList = localStorage.blockList || "[]";
             var blockList = JSON.parse(localStorage.blockList);
             for (var idx in blockList) {
+                var item = blockList[idx];
                 var opt = document.createElement("option");
-                opt.value = blockList[idx];
-                opt.innerText = blockList[idx];
+                opt.value = item.value;
+                opt.innerText = item.value;
                 blockedThreadsDropdown.appendChild(opt);
             }
         }
@@ -208,7 +207,7 @@ padding:0 4px;
             
             var unorderedList = buildElem("ul", "blockList", null);
 
-            getBlockedItems().forEach(function(blockedItem){
+            getBlockList().forEach(function(blockedItem){
 
                 var blockedListItem = buildElem("li", "blockedListItem", blockedItem);
 
@@ -228,6 +227,28 @@ padding:0 4px;
             return CP;
         }
 
+        function getBlockList() {
+            localStorage.blockList = localStorage.blockList || "[]";
+            return JSON.parse(localStorage.blockList);
+        }
+
+        function setBlockList(blockList) {
+            if (typeof blockList !== "string")
+                blockList = JSON.stringify(blockList);
+            localStorage.blockList = blockList;
+        }
+
+        function getUnblockList() {
+            localStorage.unblockList = localStorage.unblockList || "[]";
+            return JSON.parse(localStorage.unblockList);
+        }
+
+        function setUnblockList(unblockList) {
+            if (typeof unblockList !== "string")
+                unblockList = JSON.stringify(unblockList);
+            localStorage.unblockList = unblockList;
+        }
+
         function unblockThread(e) {
             console.log(e);
             e.preventDefault();
@@ -235,22 +256,21 @@ padding:0 4px;
             var createDate = new Date();
 
             var val = blockedThreadsDropdown.value;
-            localStorage.blockList = localStorage.blockList || "[]";
-            var blockList = JSON.parse(localStorage.blockList);
+            console.warn("unblock", val)
+            var blockList = getBlockList();
             blockList = blockList.filter(function(blockedItem) {
                 var blockedItemVal = blockedItem.value;
-                return blockedItem !== blockedItemVal;
+                return val !== blockedItemVal;
             });
-            localStorage.blockList = JSON.stringify(blockList);
+            setBlockList(blockList);
 
-            localStorage.unblockList = localStorage.unblockList || "[]";
-            var unblockList = JSON.parse(localStorage.unblockList);
+            var unblockList = getUnblockList();
             unblockList.push({
                 value: val,
                 created: createDate
             });
+            setUnblockList(unblockList);
 
-            localStorage.unblockList = JSON.stringify(unblockList);
             syncWithServer(function(){
                 hideShowThreads();
 
@@ -262,27 +282,18 @@ padding:0 4px;
             }, createDate);
         }
 
-        function getBlockedItems() {
-            localStorage.blockList = localStorage.blockList || "[]";
-            var blockList = JSON.parse(localStorage.blockList);
-            return blockList;            
-        }
-
         window.pushToBlocklist = function(str, createDate) {
 
-            localStorage.blockList = localStorage.blockList || "[]";
-            var blockList = JSON.parse(localStorage.blockList);
-
+            var blockList = getBlockList();
             var filter = {
                 value: str,
                 created: createDate
             }
-
             blockList.push(filter);
-            localStorage.blockList = JSON.stringify(blockList);
+            setBlockList(blockList);
 
             var newOption = document.createElement("option");
-            newOption.value = str;
+            newOption.value = filter;
             newOption.innerText = str;
             blockedThreadsDropdown.appendChild(newOption);
         };
@@ -299,8 +310,7 @@ padding:0 4px;
 
         function hideShowThreads() {
 
-            var blockList = localStorage.blockList ? JSON.parse(localStorage.blockList) : [];
-
+            var blockList = getBlockList();
             var d = document.getElementsByClassName("discussionListItem");
 
             for (var y = 0; y < d.length; y++) {
@@ -332,9 +342,6 @@ padding:0 4px;
             }
         }
 
-
-        var threads = document.getElementsByClassName("discussionListItem");
-
         function hide(e) {
             e.preventDefault();
             var threadTitle;
@@ -357,18 +364,21 @@ padding:0 4px;
             }, createDate);
         }
 
-        for (var i = 0; i < threads.length; i++) {
-            var g = document.createElement("a");
-            var hideDiv = document.createElement("div");
-            hideDiv.className = "customButtonDiv";
-            hideDiv.appendChild(g);
-            g.href = "/#/";
-            g.onclick = hide;
-            g.className = "customButtons";
-            g.innerText = "Hide";
-            var threadSubSection = threads[i].getElementsByClassName("main")[0];
-            threadSubSection.appendChild(hideDiv);
+        function generateHideButtons() {
+            var threads = document.getElementsByClassName("discussionListItem");
+            for (var i = 0; i < threads.length; i++) {
+                var g = document.createElement("a");
+                var hideDiv = document.createElement("div");
+                hideDiv.className = "customButtonDiv";
+                hideDiv.appendChild(g);
+                g.href = "/#/";
+                g.onclick = hide;
+                g.className = "customButtons";
+                g.innerText = "Hide";
+                var threadSubSection = threads[i].getElementsByClassName("main")[0];
+                threadSubSection.appendChild(hideDiv);
+            }            
         }
-
+        generateHideButtons();
     };
 })();
