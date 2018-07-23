@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.1.1
+// @version      1.1.2
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -351,12 +351,7 @@ padding:0 4px;
             var blockThreadText = threadTitle.innerText;
             var createDate = new Date();
 
-            var filter = {
-                value: blockThreadText,
-                created: createDate
-            }
-
-            pushToBlocklist(filter);
+            pushToBlocklist(blockThreadText, createDate);
             syncWithServer(function(){
                 hideShowThreads();
             }, createDate);
