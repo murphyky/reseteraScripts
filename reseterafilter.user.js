@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.1.3
+// @version      1.1.4
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -152,7 +152,7 @@ padding:0 4px;
                         var blockList = res.data.filters;
                         setBlockList(blockList);
                     }
-
+                    clearUnblockList()
                     cb()
                 },
                 error: function(err){
@@ -209,7 +209,9 @@ padding:0 4px;
 
             getBlockList().forEach(function(blockedItem){
 
-                var blockedListItem = buildElem("li", "blockedListItem", blockedItem);
+                var innerText = blockedItem.value;
+
+                var blockedListItem = buildElem("li", "blockedListItem", innerText);
 
                 var href = buildElem("a", "customButtons", "Unblock");
                 href.onclick = unblockThread;
@@ -236,6 +238,10 @@ padding:0 4px;
             if (typeof blockList !== "string")
                 blockList = JSON.stringify(blockList);
             localStorage.blockList = blockList;
+        }
+
+        function clearUnblockList() {
+            setUnblockList(null);
         }
 
         function getUnblockList() {
