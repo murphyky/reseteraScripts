@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.1.7
+// @version      1.1.8
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -89,8 +89,7 @@ padding:0 4px;
 
         topNav.insertAdjacentElement("afterend", extraFilteringOptionsContainer);
         var controlPanelBlockedItemList = null;
-        var CP = buildControlPanel();
-        topNav.insertAdjacentElement("afterend", CP);
+        var CP = null;
 
         $('.controlGroup').controlgroup();
 
@@ -217,6 +216,17 @@ padding:0 4px;
             controlPanelBlockedItemList.appendChild(blockedListItem);
         }
 
+        function removeUnblockedItem(unblockedItem) {
+            
+            var blockedItems = controlPanelBlockedItemList.getElementsByClassName("blockedListItem");
+
+            for (var i = 0 ;i < blockedItems.length; i++) {
+                if (blockedItems[i].getInnerText() === unblockedItem) {
+                    controlPanelBlockedItemList.removeChild(blockedItems[i]);
+                }
+            }
+        }
+
         function getBlockList() {
             localStorage.blockList = localStorage.blockList || "[]";
             return JSON.parse(localStorage.blockList);
@@ -252,7 +262,6 @@ padding:0 4px;
             if (e.srcElement.classList.contains("unblockControlPanel")) {
                 var srcElement = e.srcElement.parentElement.parentElement;
                 val = srcElement.getInnerText();
-                console.warn(val, srcElement)
             } else {
                 val = null;
             }
@@ -273,12 +282,7 @@ padding:0 4px;
 
             syncWithServer(function(){
                 hideShowThreads();
-
-                for (var i = 0; i < blockedThreadsDropdown.length; i++) {
-                    if (blockList.indexOf(blockedThreadsDropdown.options[i].value) === -1){
-                        blockedThreadsDropdown.remove(i);
-                    }
-                }
+                removeUnblockedItem(val);
             }, createDate);
         }
 
@@ -298,7 +302,8 @@ padding:0 4px;
 
             syncWithServer(function(){
                 hideShowThreads();
-                initiateBlockedThreadDropdown();
+                CP = buildControlPanel();
+                topNav.insertAdjacentElement("afterend", CP);
             }, new Date());
         }
 
