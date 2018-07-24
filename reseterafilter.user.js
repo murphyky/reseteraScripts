@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.1.6
+// @version      1.1.7
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -196,7 +196,7 @@ padding:0 4px;
                 appendBlockedItem(blockedItem);
             });
 
-            CP.appendChild(unorderedList);
+            CP.appendChild(controlPanelBlockedItemList);
             console.log(CP);
             return CP;
         }
