@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.1.9
+// @version      1.2.0
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -22,9 +22,13 @@ GM_addStyle(`
 background: #7e52b8;
 position:relative;
 border-radius:3px;
-float:left;
+float:right;
 margin-left: 20%;
 top: 10px;
+}
+
+.hideButtons {
+    float: left !important;
 }
 
 .titleText {
@@ -256,7 +260,7 @@ padding:0 4px;
         }
 
         function unblockThread(e) {
-            console.log(e);
+
             e.preventDefault();
 
             var createDate = new Date();
@@ -346,14 +350,18 @@ padding:0 4px;
         }
 
         function hide(e) {
+
             e.preventDefault();
             var threadTitle;
             if (e.toElement) {
                 var parentElement = e.toElement.parentElement;
                 parentElement = parentElement.parentElement;
+                parentElement = parentElement.parentElement;
+
                 threadTitle = parentElement.getElementsByTagName("h3")[0];
             } else {
                 var parentElement = e.target.parentElement;
+                parentElement = parentElement.parentElement;
                 parentElement = parentElement.parentElement;
 
                 threadTitle = parentElement.getElementsByTagName("h3")[0];
@@ -380,7 +388,6 @@ padding:0 4px;
                 g.innerText = "Hide";
                 var threadSubSection = threads[i].getElementsByClassName("paging")[0];
                 var refreshButton = threadSubSection.getElementsByTagName("a")[0]
-                console.log("refresh", refreshButton)
                 threadSubSection.insertBefore(hideDiv, refreshButton);
             }            
         }
