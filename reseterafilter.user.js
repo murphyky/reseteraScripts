@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.1.4
+// @version      1.1.5
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -59,35 +59,13 @@ padding:0 4px;
 
         var username = getUsername();
 
-        var blockedThreadsDropdown = document.createElement("select");
-        var defaultOption = document.createElement("option")
-        defaultOption.innerText = "--- Remove a filter ---";
-        blockedThreadsDropdown.appendChild(defaultOption);
-        blockedThreadsDropdown.id = "blockedThreadsDropdown";
-
         var topNav = document.getElementsByClassName("PageNav");
         topNav = topNav[0];
-
-        var unblockButtonDiv = document.createElement("div");
-        unblockButtonDiv.className = "customButtonDiv";
-        var unblockButton = document.createElement("a");
-        unblockButton.onclick = unblockThread;
-        unblockButton.href = "/#/";
-        unblockButton.className = "customButtons";
-        unblockButton.innerText = "Unblock Item";
-        unblockButton.id = "unblockButton";
-        unblockButtonDiv.appendChild(unblockButton);
-
-        var unblockContainer = document.createElement("div");
-        unblockContainer.className = "unblockContainer";
-        unblockContainer.appendChild(blockedThreadsDropdown);
-        unblockContainer.appendChild(unblockButtonDiv);
 
         var keyWordFilter = document.createElement("input");
         keyWordFilter.id = "keyWordFilter";
         keyWordFilter.placeholder = "Enter keyword to filter out threads";
         keyWordFilter.type = "text";
-
 
         var filterKeywordDiv = document.createElement("div");
         filterKeywordDiv.className = "customButtonDiv";
@@ -111,6 +89,7 @@ padding:0 4px;
         extraFilteringOptionsContainer.appendChild(unblockContainer);
 
         topNav.insertAdjacentElement("afterend", extraFilteringOptionsContainer);
+        var controlPanelBlockedItemList = null;
         var CP = buildControlPanel();
         topNav.insertAdjacentElement("afterend", CP);
 
@@ -176,6 +155,7 @@ padding:0 4px;
             }
         }
 
+        /*
         function initiateBlockedThreadDropdown() {
             localStorage.blockList = localStorage.blockList || "[]";
             var blockList = JSON.parse(localStorage.blockList);
@@ -186,15 +166,20 @@ padding:0 4px;
                 opt.innerText = item.value;
                 blockedThreadsDropdown.appendChild(opt);
             }
-        }
+        }*/
 
         function buildElem(elem, className, innerText) {
 
             var ele = document.createElement(elem);
             if (className)
                 ele.className = className;
-            if (innerText)
+            if (innerText) {
                 ele.innerText = innerText;
+
+                ele.getInnerText = function() {
+                    return innerText;
+                }
+            }
             return ele;
         }
 
@@ -205,28 +190,32 @@ padding:0 4px;
             .appendChild(buildElem("legend", null, "Blacklisted threads and keywords"))
             .insertAdjacentElement("afterend", buildElem("div", "controlGroup", null))
             
-            var unorderedList = buildElem("ul", "blockList", null);
+            controlPanelBlockedItemList = buildElem("ul", "blockList", null);
 
             getBlockList().forEach(function(blockedItem){
 
-                var innerText = blockedItem.value;
-
-                var blockedListItem = buildElem("li", "blockedListItem", innerText);
-
-                var href = buildElem("a", "customButtons", "Unblock");
-                href.onclick = unblockThread;
-                href.href = "/#/";
-
-                var unblockButton = buildElem("div", "customButtonDiv", null);
-                unblockButton.appendChild(href);
-
-                blockedListItem.appendChild(unblockButton);
-                unorderedList.appendChild(blockedListItem);
+                appendBlockedItem(blockedItem);
             });
 
             CP.appendChild(unorderedList);
             console.log(CP);
             return CP;
+        }
+
+        function appendBlockedItem(blockedItem) {
+            var innerText = blockedItem.value;
+
+            var blockedListItem = buildElem("li", "blockedListItem", innerText);
+
+            var href = buildElem("a", "customButtons unblockControlPanel", "Unblock");
+            href.onclick = unblockThread;
+            href.href = "/#/";
+
+            var unblockButton = buildElem("div", "customButtonDiv", null);
+            unblockButton.appendChild(href);
+
+            blockedListItem.appendChild(unblockButton);
+            controlPanelBlockedItemList.appendChild(blockedListItem);
         }
 
         function getBlockList() {
@@ -241,7 +230,7 @@ padding:0 4px;
         }
 
         function clearUnblockList() {
-            setUnblockList(null);
+            setUnblockList([]);
         }
 
         function getUnblockList() {
@@ -260,9 +249,15 @@ padding:0 4px;
             e.preventDefault();
 
             var createDate = new Date();
+            var val;
+            if (e.srcElement.classList.contains("unblockControlPanel")) {
+                var srcElement = e.srcElement.parentElement.parentElement;
+                val = srcElement.getInnerText();
+                console.warn(val, srcElement)
+            } else {
+                val = null;
+            }
 
-            var val = blockedThreadsDropdown.value;
-            console.warn("unblock", val)
             var blockList = getBlockList();
             blockList = blockList.filter(function(blockedItem) {
                 var blockedItemVal = blockedItem.value;
@@ -297,11 +292,7 @@ padding:0 4px;
             }
             blockList.push(filter);
             setBlockList(blockList);
-
-            var newOption = document.createElement("option");
-            newOption.value = filter;
-            newOption.innerText = str;
-            blockedThreadsDropdown.appendChild(newOption);
+            appendBlockedItem(filter);
         };
 
         function init() {
