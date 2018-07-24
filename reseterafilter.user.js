@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.1.5
+// @version      1.1.6
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -86,7 +86,6 @@ padding:0 4px;
         var extraFilteringOptionsContainer = document.createElement("div");
         extraFilteringOptionsContainer.id = "extraFilteringOptionsContainer";
         extraFilteringOptionsContainer.appendChild(keyworldFilterContainer);
-        extraFilteringOptionsContainer.appendChild(unblockContainer);
 
         topNav.insertAdjacentElement("afterend", extraFilteringOptionsContainer);
         var controlPanelBlockedItemList = null;
