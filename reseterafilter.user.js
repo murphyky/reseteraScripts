@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Resetera filter threads
-// @version      1.1.8
+// @version      1.1.9
 // @description  Filters threads based on keywords
 // @author       Kyle Murphy
 // @match        https://www.resetera.com/forums/*
@@ -22,9 +22,11 @@ GM_addStyle(`
 background: #7e52b8;
 position:relative;
 border-radius:3px;
-float:right;
+float:left;
+margin-left: 20%;
 top: 10px;
 }
+
 .titleText {
 float:left;
 width: 80%;
@@ -370,14 +372,16 @@ padding:0 4px;
             for (var i = 0; i < threads.length; i++) {
                 var g = document.createElement("a");
                 var hideDiv = document.createElement("div");
-                hideDiv.className = "customButtonDiv";
+                hideDiv.className = "customButtonDiv hideButtons";
                 hideDiv.appendChild(g);
                 g.href = "/#/";
                 g.onclick = hide;
                 g.className = "customButtons";
                 g.innerText = "Hide";
-                var threadSubSection = threads[i].getElementsByClassName("main")[0];
-                threadSubSection.appendChild(hideDiv);
+                var threadSubSection = threads[i].getElementsByClassName("paging")[0];
+                var refreshButton = threadSubSection.getElementsByTagName("a")[0]
+                console.log("refresh", refreshButton)
+                threadSubSection.insertBefore(hideDiv, refreshButton);
             }            
         }
         generateHideButtons();
